@@ -12,6 +12,8 @@ namespace CbrDailyWorker
         private readonly DbService _dbService;
         private readonly IConfiguration _configuration;
 
+        private readonly int _timeout = 60;
+
         public Worker(ILogger<Worker> logger, DbService dbService, IConfiguration configuration)
         {
             _logger = logger;
@@ -27,8 +29,10 @@ namespace CbrDailyWorker
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             //Настраиваем таймаут для проверки необходимости действий
-            int timeout = 60;
-            int.TryParse(_configuration.GetSection("Settings")["Timeout"], out timeout);
+            if (!int.TryParse(_configuration.GetSection("Settings")["Timeout"], out int timeout))
+            {
+                timeout = _timeout;
+            }
 
             //Если информация о бэкенде не инициализрована,
             //то инициализируем, включая список валют
